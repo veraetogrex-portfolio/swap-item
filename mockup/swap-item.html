@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T39 Swap Item — the replacement takes the empty place in the order</title>
+<link rel="stylesheet" href="_shared/nocturne.css">
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* the whole app screen from ../, in Nocturne type; no grid on the app screen */
+  #stage{background:#07080C}
+  #stage .vm{position:absolute;left:0;top:0;--font:var(--f-text)}
+  body.autoplay #stage :focus-visible{outline:none}
+  body.autoplay #li-cursor{transition:none}   /* visible from frame one */
+  #li-cursor svg{transform:scale(1.5);transform-origin:4px 3px}   /* the hand stays readable in a phone-sized reel */
+  #li-cursor.down svg{transform:scale(1.3)}
+</style>
+</head>
+<body>
+<div id="stage" data-title="T39 Swap Item" data-url="veraetogrex-portfolio.github.io/swap-item">
+  <section class="vm" aria-label="VECTOR Market" data-assets="../assets/"></section>
+</div>
+<script src="_shared/stage.js"></script>
+<script src="../script.js"></script>
+<script>
+const app = document.querySelector('.vm').marketApp;
+const at = sel => { const r = Stage.rect(document.querySelector(sel)); return [r.cx, r.cy]; };
+const REST = [1084, 600];   // the gutter between the main column and the right one
+// one act: home, the oat drink is out of stock → order #48217, the pair "was → will be" → Accept replacement
+Stage.init({
+  reset: () => app.reset(),
+  cursorStart: REST,
+  async demo(s) {
+    const t0 = performance.now();
+    await s.until(t0, 1000);                          // the whole home screen at rest first
+    const [rx, ry] = at('[data-review]');
+    await s.move([rx + 40, ry + 6], 650);             // Review replacement, right half: the hand stays off the carton and the text
+    await s.until(t0, 1900);
+    await s.click(null, { hold: 110 });               // → order #48217: the pale carton "Out of stock" next to the green "No added sugar"
+    await s.until(t0, 3700);
+    const [ax, ay] = at('[data-accept]');
+    await s.move([ax + 104, ay + 6], 550);            // Accept replacement, right end: the label and both cartons stay visible
+    await s.until(t0, 4500);
+    await s.click(null, { hold: 120 });               // the green carton slides onto the pale one (0.6 s), the choice folds into the list (0.6 s)
+    await s.until(t0, 4900);
+    await s.move([1080, 868], 600);                   // the hand leaves for the bottom gutter: nothing covers the new row, the chat or the total
+    await s.until(t0, 9700);                          // close-ups at 2.8×: the carton in its row, "Replacement confirmed", the total $63.98; then the whole screen
+  },
+});
+</script>
+</body>
+</html>
